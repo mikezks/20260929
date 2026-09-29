@@ -7,17 +7,15 @@ import { RouterModule } from '@angular/router';
 
 
 @NgModule({
-  declarations: [
-    HeaderbarComponent,
-    SidebarComponent
-  ],
-  imports: [
-    CommonModule,
-    RouterModule
-  ],
-  exports: [
-    HeaderbarComponent,
-    SidebarComponent
-  ]
+    imports: [
+        CommonModule,
+        RouterModule,
+        HeaderbarComponent,
+        SidebarComponent
+    ],
+    exports: [
+        HeaderbarComponent,
+        SidebarComponent
+    ]
 })
 export class UiCoreModule { }

@@ -2,10 +2,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.Eager,
-  selector: 'app-home',
-  standalone: false,
-  template: `
+    changeDetection: ChangeDetectionStrategy.Eager,
+    selector: 'app-home',
+    template: `
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">Modern Angular</h2>
@@ -24,7 +23,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     code {
       color: blue;
     }
@@ -32,3 +31,5 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 })
 export class HomeComponent {
 }
+
+export default HomeComponent;
