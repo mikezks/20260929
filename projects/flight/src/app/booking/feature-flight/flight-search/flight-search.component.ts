@@ -1,16 +1,16 @@
+import { AsyncPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Flight, FlightFilter } from '../../logic-flight';
-import { TicketsFacade } from './../../logic-flight/+state/facade';
-import { UiFlightModule } from '../../ui-flight/ui-flight.module';
-import { AsyncPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
+import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
+import { TicketsFacade } from './../../logic-flight/+state/facade';
 
 
 @Component({
   changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-flight-search',
   imports: [
-    UiFlightModule,
+    FlightFilterComponent,
     FlightCardComponent,
     NgIf, NgFor,
     JsonPipe, AsyncPipe
