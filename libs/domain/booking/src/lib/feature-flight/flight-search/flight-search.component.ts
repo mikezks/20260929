@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight } from '../../logic-flight/model/flight';
 import { FlightFilter } from '../../logic-flight/model/flight-filter';
@@ -20,7 +20,7 @@ import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filt
   ],
   templateUrl: './flight-search.component.html',
 })
-export class FlightSearchComponent implements OnInit {
+export class FlightSearchComponent {
   private ticketsFacade = injectTicketsFacade();
 
   protected filter = {

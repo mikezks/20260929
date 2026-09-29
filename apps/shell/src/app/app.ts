@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderbarComponent, SidebarComponent } from '@flight-demo/shared/core';
+import { injectBaseUrl } from './app.provider';
 
 
 @Component({
@@ -32,4 +33,7 @@ import { HeaderbarComponent, SidebarComponent } from '@flight-demo/shared/core';
   `
 })
 export class App {
+  constructor() {
+    console.log(injectBaseUrl(''));
+  }
 }

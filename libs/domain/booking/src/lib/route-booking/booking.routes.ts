@@ -9,6 +9,9 @@ import { MyFlightsComponent } from "../feature-flight/my-flights/my-flights.comp
 import { resolveFlight } from "../logic-flight/data-access/flight.resolver";
 import { TicketEffects } from "../logic-flight/state/redux/effects";
 import { ticketFeature } from "../logic-flight/state/redux/reducer";
+import { HttpClient, provideHttpClient, withInterceptors, withRequestsMadeViaParent } from "@angular/common/http";
+import { authInterceptor } from "@flight-demo/shared/core";
+import { inject, provideEnvironmentInitializer } from "@angular/core";
 
 
 export const BOOKING_ROUTES: Routes = [
@@ -18,6 +21,18 @@ export const BOOKING_ROUTES: Routes = [
     providers: [
       provideState(ticketFeature),
       provideEffects([TicketEffects]),
+      provideHttpClient(
+        withInterceptors([
+          authInterceptor
+        ]),
+        withRequestsMadeViaParent()
+      ),
+      provideEnvironmentInitializer((
+        http = inject(HttpClient)
+      ) => {
+        http.get('https://demo.angulararchitects.io/api/flight/3')
+          .subscribe(flight => console.log(flight))
+      })
     ],
     children: [
       {
