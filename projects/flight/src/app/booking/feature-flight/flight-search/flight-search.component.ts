@@ -1,12 +1,18 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Flight, FlightFilter } from '../../logic-flight';
 import { TicketsFacade } from './../../logic-flight/+state/facade';
+import { UiFlightModule } from '../../ui-flight/ui-flight.module';
+import { AsyncPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 
 
 @Component({
   changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-flight-search',
-  standalone: false,
+  imports: [
+    UiFlightModule,
+    NgIf, NgFor,
+    JsonPipe, AsyncPipe
+  ],
   templateUrl: './flight-search.component.html',
 })
 export class FlightSearchComponent {
