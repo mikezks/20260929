@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, Injector, OnInit, runInInjectionContext } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight } from '../../logic-flight/model/flight';
 import { FlightFilter } from '../../logic-flight/model/flight-filter';
 import { injectTicketsFacade } from '../../logic-flight/state/facade';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
 import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
-import { Router } from '@angular/router';
 
 
 @Component({
@@ -23,7 +22,6 @@ import { Router } from '@angular/router';
 })
 export class FlightSearchComponent implements OnInit {
   private ticketsFacade = injectTicketsFacade();
-  private readonly injector = inject(Injector);
 
   protected filter = {
     from: 'Paris',
@@ -35,19 +33,6 @@ export class FlightSearchComponent implements OnInit {
     5: true
   };
   protected flights$ = this.ticketsFacade.flights$;
-
-  constructor() {
-  }
-  
-  ngOnInit(): void {
-    const router = runInInjectionContext(
-      this.injector,
-      () => inject(Router)
-    );
-    console.log(router);
-
-    console.log(this.injector.get(Router));
-  }
 
   protected search(filter: FlightFilter): void {
     this.filter = filter;
