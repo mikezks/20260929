@@ -1,7 +1,7 @@
 import { httpResource } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, effect, input, numberAttribute, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { form, FormField } from '@angular/forms/signals';
+import { form, FormField, required } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
 
@@ -20,7 +20,11 @@ export class PassengerEditComponent {
   // Data Model: Writable Signal
   private readonly passenger = signal(initialPassenger);
 
-  protected readonly editForm = form(this.passenger);
+  protected readonly editForm = form(this.passenger, path => {
+    required(path.name, {
+      message: 'The lastname is mandatory - please enter a value.'
+    })
+  });
 
   readonly id = input(0, { transform: numberAttribute });
   protected readonly passengerResource = httpResource<Passenger>(
