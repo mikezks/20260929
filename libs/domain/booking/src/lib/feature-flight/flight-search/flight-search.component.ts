@@ -38,6 +38,7 @@ export class FlightSearchComponent {
   protected flights$ = this.ticketsFacade.flights$;
 
   constructor() {
+    // Effect Signal-Tracking
     effect(() => console.log(this.route()));
     // effect(() => this.search());
     effect(() => {
@@ -45,7 +46,27 @@ export class FlightSearchComponent {
       untracked(() => this.search());
     });
 
-    
+    // Signal-Update Behavior
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Barcelona' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Madrid' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Mailand' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Rom' }));
+    console.log(this.filter().from);
+    this.filter.update(curr => ({ ...curr, from: 'Oslo' }));
+    console.log(this.filter().from);
+
+    // Glitch-free Mode
+    const counter = signal(0);
+    const isEven = computed(() => counter() % 2 === 0);
+    effect(() => console.log({
+      counter: untracked(() => counter()),
+      isEven: isEven()
+    }));
+    setInterval(() => counter.update(curr => curr + 1), 2_000);
   }
 
   protected search(): void {
