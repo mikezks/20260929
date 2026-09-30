@@ -44,6 +44,8 @@
           {{ editForm.controls.passengerStatus.errors?.['passengerStatus'].validStatus.join(', ') }}
         </div>
       } -->
+
+      <app-address-subform [formField]="editForm.address" />
     </form>
 
     <p>Status: {{ passengerResource.status() }}</p>

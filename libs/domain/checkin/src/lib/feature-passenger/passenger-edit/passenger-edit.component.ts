@@ -1,6 +1,7 @@
 import { httpResource } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, input, numberAttribute, signal } from '@angular/core';
-import { form, FormField, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, numberAttribute, signal } from '@angular/core';
+import { apply, form, FormField, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { Address, AddressControl, addressSchema, initialAddress } from '@flight-demo/shared/core';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
 
@@ -21,13 +22,16 @@ export function validateLastname(
 }
 
 // (3) Field Logic: Validators, Conditional readonly, disabled, ...
-export const passengerSchema = schema<Passenger>(passengerPath => {
+export const passengerSchema = schema<Passenger & {
+  address: Address
+}>(passengerPath => {
   required(passengerPath.name, {
     message: 'The lastname is mandatory - please enter a value.'
   });
   validateLastname(passengerPath.name, [
     'Smith', 'Williams', 'Brown', 'Jones'
-  ], 'This Lastname is not allowed.')
+  ], 'This Lastname is not allowed.');
+  apply(passengerPath.address, addressSchema)
 });
 
 
@@ -39,6 +43,7 @@ export const passengerSchema = schema<Passenger>(passengerPath => {
     RouterLink,
     // (4) UI Control: Template Binding
     FormField,
+    AddressControl
   ],
   templateUrl: './passenger-edit.component.html'
 })
@@ -48,9 +53,14 @@ export class PassengerEditComponent {
     () => `https://demo.angulararchitects.io/api/passenger?id=${ this.id() }`,
     { defaultValue: initialPassenger }
   );
+  protected readonly passengerWithAddress = linkedSignal(() => ({
+    ...this.passengerResource.value(),
+    address: initialAddress
+  }));
+
 
   // (2) Field State: valid, value, dirty, ...
-  protected readonly editForm = form(this.passengerResource.value, passengerSchema);
+  protected readonly editForm = form(this.passengerWithAddress, passengerSchema);
 
   readonly id = input(0, { transform: numberAttribute });
 
