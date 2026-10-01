@@ -33,7 +33,15 @@
               "@angular/material/prebuilt-themes/indigo-pink.css",
               "@angular-architects/paper-design/assets/css/bootstrap.css",
               "apps/shell/src/styles.scss"
-            ]
+            ],
+            "server": "apps/shell/src/main.server.ts",
+            "outputMode": "server",
+            "security": {
+              "allowedHosts": []
+            },
+            "ssr": {
+              "entry": "apps/shell/src/server.ts"
+            }
           },
           "configurations": {
             "production": {
@@ -88,10 +96,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "apps/shell/**/*.ts",
-              "apps/shell/**/*.html"
-            ],
+            "lintFilePatterns": ["apps/shell/**/*.ts", "apps/shell/**/*.html"],
             "eslintConfig": "apps/shell/eslint.config.js"
           }
         }

@@ -5,7 +5,7 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { APP_ROUTES } from './app.routes';
-
+import { provideClientHydration } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,5 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideEffects(),
     provideRouterFeature(),
     provideStoreDevtools(),
-  ]
+    provideClientHydration(),
+  ],
 };
