@@ -11,12 +11,12 @@ import { FlightFilter } from '../model/flight-filter';
 
 
 export interface BookingState {
-  filter: FlightFilter;
+  _filter: FlightFilter;
   basket: Record<number, boolean>;
 }
 
 export const initialBookingState: BookingState = {
-  filter: {
+  _filter: {
     from: 'Hamburg',
     to: 'Graz',
     urgent: false
@@ -49,8 +49,8 @@ export const BookingStore = signalStore(
   })),
   // Updater
   withMethods(store => ({
-    _setFilter: (filter: FlightFilter) => patchState(store, { filter }),
-    updateBasket: (id: number, selected: boolean) => patchState(store, state => ({
+    _setFilter: (filter: FlightFilter) => patchState(store, { _filter: filter }),
+    _updateBasket: (id: number, selected: boolean) => patchState(store, state => ({
       basket: {
         ...state.basket,
         [id]: selected
@@ -58,29 +58,29 @@ export const BookingStore = signalStore(
     })),
     setFlights: (flights: Flight[]) =>
       patchState(store, setAllEntities(flights, flightEntity)),
-    delayFlight: (id: number, addMin = 5) => patchState(store, updateEntity({ id, changes: flight => ({
+    _delayFlight: (id: number, addMin = 5) => patchState(store, updateEntity({ id, changes: flight => ({
       date: addMinutes(flight.date, addMin)
     })}, flightEntity)),
     resetFlights: () => patchState(store, removeAllEntities(flightEntity)),
   })),
   withProps(store => ({
     writableFilter: linkedSignal(
-      store.filter,
+      store._filter,
       { set: store._setFilter }
     ),
     writableFlightSelect: (id: number) => linkedSignal(
       () => store.basket()[id],
-      { set: (selected: boolean) => store.updateBasket(id, selected) }
+      { set: (selected: boolean) => store._updateBasket(id, selected) }
     ),
     writableFlight: (id: number) => linkedSignal(
       () => store.flightEntityMap()[id],
-      { set: () => store.delayFlight(id) }
+      { set: () => store._delayFlight(id) }
     ),
   })),
   // Side-Effects
   withMethods(store => ({
-    load: rxMethod<FlightFilter>(pipe(
-      switchMap(filter => store.flightService.find(
+    _load: rxMethod<FlightFilter>(pipe(
+      switchMap(filter => store._flightService.find(
         filter.from, filter.to, filter.urgent
       ).pipe(
         tapResponse({
@@ -92,6 +92,6 @@ export const BookingStore = signalStore(
   })),
   // Store Setup
   withHooks(store => ({
-    onInit: () => store.load(store.filter)
+    onInit: () => store._load(store._filter)
   }))
 );
