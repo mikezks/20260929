@@ -1,17 +1,18 @@
 import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, type, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals';
+import { entityConfig, removeAllEntities, removeEntities, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { Flight } from '../model/flight';
 import { FlightFilter } from '../model/flight-filter';
 import { pipe, switchMap } from 'rxjs';
 import { inject } from '@angular/core';
 import { FlightService } from '../data-access/flight.service';
+import { addMinutes } from '@flight-demo/shared/core';
 
 
 export interface BookingState {
   filter: FlightFilter;
   basket: Record<number, boolean>;
-  flights: Flight[];
 }
 
 export const initialBookingState: BookingState = {
@@ -24,9 +25,46 @@ export const initialBookingState: BookingState = {
     2: true,
     3: true,
     5: true,
-  },
-  flights: []
+  }
 };
+
+export const flightEntity = entityConfig({
+  entity: type<Flight>(),
+  collection: 'flight',
+  // selectId: flight => flight.id
+});
+
+const flightState = {
+  entities: {
+    2: {
+      id: 2,
+      from: 'Hamburg',
+      to: 'Graz',
+      date: new Date().toISOString(),
+      delayed: false
+    },
+    3: {
+      id: 3,
+      from: 'Hamburg',
+      to: 'Graz',
+      date: new Date().toISOString(),
+      delayed: false
+    },
+    5: {
+      id: 5,
+      from: 'Hamburg',
+      to: 'Graz',
+      date: new Date().toISOString(),
+      delayed: false
+    },
+  },
+  ids: [5, 2, 3]
+} as {
+  entities: Record<number, Flight>,
+  ids: number[]
+};
+
+const flights = flightState.ids.map(id => flightState.entities[id]);
 
 
 export const BookingStore = signalStore(
@@ -34,8 +72,12 @@ export const BookingStore = signalStore(
   { providedIn: 'root' },
   // State
   withState(initialBookingState),
+  withEntities(flightEntity),
   withComputed(store => ({
-    delayed: () => store.flights().filter(flight => flight.delayed),
+    delayed: () => store.flightEntities().filter(flight => flight.delayed),
+  })),
+  withProps(() => ({
+    flightService: inject(FlightService)
   })),
   // Updater
   withMethods(store => ({
@@ -46,16 +88,17 @@ export const BookingStore = signalStore(
         [id]: selected
       }
     })),
-    setFlights: (flights: Flight[]) => patchState(store, { flights }),
-    resetFlights: () => patchState(store, { flights: [] }),
+    setFlights: (flights: Flight[]) =>
+      patchState(store, setAllEntities(flights, flightEntity)),
+    delayFlight: (id: number, addMin = 5) => patchState(store, updateEntity({ id, changes: flight => ({
+      date: addMinutes(flight.date, addMin)
+    })}, flightEntity)),
+    resetFlights: () => patchState(store, removeAllEntities(flightEntity)),
   })),
   // Side-Effects
-  withMethods((
-    store,
-    flightService = inject(FlightService)
-  ) => ({
+  withMethods(store => ({
     load: rxMethod<FlightFilter>(pipe(
-      switchMap(filter => flightService.find(
+      switchMap(filter => store.flightService.find(
         filter.from, filter.to, filter.urgent
       ).pipe(
         tapResponse({
@@ -65,6 +108,7 @@ export const BookingStore = signalStore(
       ))
     )),
   })),
+  // Store Setup
   withHooks(store => ({
     onInit: () => store.load(store.filter)
   }))
