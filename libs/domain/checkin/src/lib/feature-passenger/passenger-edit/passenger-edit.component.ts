@@ -1,22 +1,26 @@
 import { httpResource } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, input, linkedSignal, numberAttribute, signal } from '@angular/core';
-import { apply, form, FormField, FormRoot, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, numberAttribute, signal } from '@angular/core';
+import { apply, createMetadataKey, form, FormField, FormRoot, metadata, required, schema, SchemaPath, validate } from '@angular/forms/signals';
 import { Address, AddressControl, addressSchema, initialAddress } from '@flight-demo/shared/core';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
 
 
+const ALLOWED_LASTNAMES = createMetadataKey<string[]>();
+
 export function validateLastname(
   field: SchemaPath<string>,
-  allowedLastnames: string[],
   message: string
 ): void {
-  validate(field, ({ value }) => allowedLastnames.includes(value())
-    ? null
-    : {
-      kind: 'forbiddenLastname',
-      message: message + ' Enter one of those Lastnames: '
-        + allowedLastnames.join(', ')
+  validate(field, ({ value, state }) => {
+    const allowedLastnames = state.metadata(ALLOWED_LASTNAMES)?.() || [];
+    return allowedLastnames.includes(value())
+      ? null
+      : {
+        kind: 'forbiddenLastname',
+        message: message + ' Enter one of those Lastnames: '
+          + allowedLastnames.join(', ')
+      }
     }
   );
 }
@@ -26,12 +30,13 @@ export const passengerSchema = schema<{
   passenger: Passenger
   address: Address
 }>(passengerPath => {
+  metadata(passengerPath.passenger.name, ALLOWED_LASTNAMES, () => [
+    'Smith', 'Williams', 'Brown', 'Jones'
+  ]);
   required(passengerPath.passenger.name, {
     message: 'The lastname is mandatory - please enter a value.'
   });
-  validateLastname(passengerPath.passenger.name, [
-    'Smith', 'Williams', 'Brown', 'Jones'
-  ], 'This Lastname is not allowed.');
+  validateLastname(passengerPath.passenger.name, 'This Lastname is not allowed.');
   apply(passengerPath.address, addressSchema)
 });
 
@@ -76,6 +81,10 @@ export class PassengerEditComponent {
   );
 
   readonly id = input(0, { transform: numberAttribute });
+
+  protected readonly allowedLastnames = computed(
+    () => this.editForm.passenger.name().metadata(ALLOWED_LASTNAMES)?.()?.join(', ') || ''
+  );
 
   protected save(): void {
     console.log(this.editForm().value());
