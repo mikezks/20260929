@@ -6,7 +6,7 @@
   </div>
 
   <div class="card-body">
-    <app-flight-filter [(filter)]="store.writableFilter">
+    <app-flight-filter [(filter)]="store.writableFilter" #flightFilter>
     <!-- <app-flight-filter
       [filter]="store.writableFilter()"
       (filterChange)="store.writableFilter.set($event)"
@@ -25,25 +25,33 @@
   </div>
 </div>
 
-<div class="row">
-  @for (flight of flights; track flight) {
-    @let id = flight.id;
-    @let writableFlightSelect = store.writableFlightSelect(id);
-    @let writableFlight = store.writableFlight(id);
-    <div class="col-xs-12 col-sm-6 col-md-4">
-      <app-flight-card
-        [(item)]="writableFlight"
-        [(selected)]="writableFlightSelect"
-      />
-    </div>
-  }
-</div>
+@defer (on interaction(flightFilter); prefetch on timer(10s)) {
+  <div class="row">
+    @for (flight of flights; track flight.id) {
+      @let id = flight.id;
+      @let writableFlightSelect = store.writableFlightSelect(id);
+      @let writableFlight = store.writableFlight(id);
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <app-flight-card
+          [(item)]="writableFlight"
+          [(selected)]="writableFlightSelect"
+        />
+      </div>
+    }
+  </div>
+} @placeholder {
+  <p>The result view will be loaded at the right time - relax!</p>
+}
 
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">Basket</h2>
+@defer (on timer(5s)) {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Basket</h2>
+    </div>
+    <div class="card-body">
+      <pre>{{ store.basket() | json }}</pre>
+    </div>
   </div>
-  <div class="card-body">
-    <pre>{{ store.basket() | json }}</pre>
-  </div>
-</div>
+} @placeholder {
+  <p>The basket will be loaded at the right time - relax!</p>
+}
