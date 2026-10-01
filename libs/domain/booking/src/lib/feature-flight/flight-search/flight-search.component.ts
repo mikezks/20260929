@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookingStore } from '../../logic-flight/state/booking.store';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
 import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
+import { injectDispatch } from '@ngrx/signals/events';
+import { flightEvents } from '../../logic-flight/state/flight.events';
 
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- preserves the workshop's pre-v22 behavior
-  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-flight-search',
   imports: [
     CommonModule,
@@ -20,4 +20,5 @@ import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filt
 })
 export class FlightSearchComponent {
   protected store = inject(BookingStore);
+  protected flightEvents = injectDispatch(flightEvents);
 }

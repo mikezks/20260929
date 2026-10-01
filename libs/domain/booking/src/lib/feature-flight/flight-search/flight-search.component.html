@@ -4,20 +4,19 @@
   <div class="card-header">
     <h2 class="card-title">Flight Search</h2>
   </div>
-
+  
   <div class="card-body">
-    <app-flight-filter [(filter)]="store.writableFilter">
-    <!-- <app-flight-filter
-      [filter]="store.writableFilter()"
-      (filterChange)="store.writableFilter.set($event)"
-    > -->
+    <app-flight-filter
+      [filter]="store.filter()"
+      (filterChange)="flightEvents.filterChanged($event)"
+    >
       @if (flights.length) {
         <div class="flight-filter-info">
           {{ flights.length }} flights found!
         </div>
       }
       @if (flights.length) {
-        <button (click)="store.resetFlights()"
+        <button (click)="flightEvents.flightsResetTriggered()"
           class="btn btn-default flight-filter-button"
         >Reset</button>
       }
@@ -26,14 +25,15 @@
 </div>
 
 <div class="row">
-  @for (flight of flights; track flight) {
-    @let id = flight.id;
-    @let writableFlightSelect = store.writableFlightSelect(id);
-    @let writableFlight = store.writableFlight(id);
+  @for (flight of flights; track flight.id) {
     <div class="col-xs-12 col-sm-6 col-md-4">
       <app-flight-card
-        [(item)]="writableFlight"
-        [(selected)]="writableFlightSelect"
+        [item]="flight"
+        [selected]="store.basket()[flight.id]"
+        (selectedChange)="flightEvents.flightSelectionChanged({
+          id: flight.id, selected: $event
+        })"
+        (itemChange)="flightEvents.flightDelayTriggered({ id: flight.id })"
       />
     </div>
   }
