@@ -26,6 +26,7 @@
         "./libs/shared/state/src/index.ts"
       ]
     },
+    "rootDir": ".",
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,

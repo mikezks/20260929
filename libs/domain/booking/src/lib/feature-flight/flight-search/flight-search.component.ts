@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight } from '@flight-demo/domain/booking-api-boarding';
-import { FlightService } from '../../logic-flight/data-access/flight.service';
 import { FlightFilter } from '../../logic-flight/model/flight-filter';
+import { BookingStore } from '../../logic-flight/state/booking.store';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
 import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
 
@@ -21,35 +21,19 @@ import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filt
   templateUrl: './flight-search.component.html',
 })
 export class FlightSearchComponent {
-  private flightService = inject(FlightService);
-  private changeDetector = inject(ChangeDetectorRef);
+  private store = inject(BookingStore);
 
-  protected filter = {
-    from: 'Paris',
-    to: 'New York',
-    urgent: false
-  };
-  protected basket: Record<number, boolean> = {
-    3: true,
-    5: true
-  };
-  protected flights: Flight[] = [];
+  protected filter = this.store.filter;
+  protected basket = this.store.basket;
+  protected flights = this.store.flights;
+
+  constructor() {
+    
+  }
 
   protected search(filter: FlightFilter): void {
-    this.filter = filter;
-
-    if (!this.filter.from || !this.filter.to) {
-      return;
-    }
-
-    this.flightService.find(
-      this.filter.from, this.filter.to, this.filter.urgent
-    ).subscribe(
-      flights => {
-        this.flights = flights;
-        this.changeDetector.markForCheck();
-      }
-    );
+    this.store.setFilter(filter);
+    this.store.load(this.filter());
   }
 
   protected delay(flight: Flight): void {
@@ -63,12 +47,13 @@ export class FlightSearchComponent {
       delayed: true
     };
 
-    this.flights = this.flights.map(
+    const flights = this.flights().map(
       flight => flight.id === newFlight.id ? newFlight : flight
     );
+    this.store.setFlights(flights);
   }
 
   protected reset(): void {
-    this.flights = [];
+    this.store.setFlights([]);
   }
 }
