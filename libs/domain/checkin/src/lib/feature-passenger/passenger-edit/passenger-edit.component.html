@@ -7,19 +7,19 @@
     <form>
       <div class="form-group">
         <label for="id">ID:</label>
-        <input id="id" [formField]="editForm.id" type="number" class="form-control" />
+        <input id="id" [formField]="editForm.passenger.id" type="number" class="form-control" />
       </div>
 
       <div class="form-group">
         <label for="firstname">Firstname:</label>
-        <input id="firstname" [formField]="editForm.firstName" class="form-control" />
+        <input id="firstname" [formField]="editForm.passenger.firstName" class="form-control" />
       </div>
 
       <div class="form-group">
         <label for="name">Lastname:</label>
-        <input id="name" [formField]="editForm.name" class="form-control" />
+        <input id="name" [formField]="editForm.passenger.name" class="form-control" />
       </div>
-      @for (error of editForm.name().errors(); track error.kind) {
+      @for (error of editForm.passenger.name().errors(); track error.kind) {
         <div class="alert alert-danger">{{ error.message }}</div>
       }
 
@@ -27,7 +27,7 @@
         <label for="bonusMiles">Bonus Miles:</label>
         <input
           id="bonusMiles"
-          [formField]="editForm.bonusMiles"
+          [formField]="editForm.passenger.bonusMiles"
           type="number"
           class="form-control"
         />
@@ -35,15 +35,8 @@
 
       <div class="form-group">
         <label for="status">Status:</label>
-        <input id="status" [formField]="editForm.passengerStatus" class="form-control" />
+        <input id="status" [formField]="editForm.passenger.passengerStatus" class="form-control" />
       </div>
-      <!-- @if (editForm.controls.passengerStatus.hasError('passengerStatus')) {
-        <div class="alert alert-danger">
-          Please enter a valid passenger status.<br>
-          The following values are allowed:
-          {{ editForm.controls.passengerStatus.errors?.['passengerStatus'].validStatus.join(', ') }}
-        </div>
-      } -->
 
       <app-address-subform [formField]="editForm.address" />
     </form>

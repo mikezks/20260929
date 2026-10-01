@@ -22,13 +22,14 @@ export function validateLastname(
 }
 
 // (3) Field Logic: Validators, Conditional readonly, disabled, ...
-export const passengerSchema = schema<Passenger & {
+export const passengerSchema = schema<{
+  passenger: Passenger
   address: Address
 }>(passengerPath => {
-  required(passengerPath.name, {
+  required(passengerPath.passenger.name, {
     message: 'The lastname is mandatory - please enter a value.'
   });
-  validateLastname(passengerPath.name, [
+  validateLastname(passengerPath.passenger.name, [
     'Smith', 'Williams', 'Brown', 'Jones'
   ], 'This Lastname is not allowed.');
   apply(passengerPath.address, addressSchema)
@@ -54,10 +55,12 @@ export class PassengerEditComponent {
     { defaultValue: initialPassenger }
   );
   protected readonly passengerWithAddress = linkedSignal(() => ({
-    ...this.passengerResource.value(),
+    passenger: this.passengerResource.value(),
     address: initialAddress
-  }));
-
+  }), { set: (passengerWithAddress, rawSetter) => {
+    this.passengerResource.set(passengerWithAddress.passenger);
+    rawSetter(passengerWithAddress);
+  }});
 
   // (2) Field State: valid, value, dirty, ...
   protected readonly editForm = form(this.passengerWithAddress, passengerSchema);
@@ -66,6 +69,7 @@ export class PassengerEditComponent {
 
   protected save(): void {
     console.log(this.editForm().value());
+    console.log(this.passengerWithAddress());
     console.log(this.passengerResource.value());
   }
 }
