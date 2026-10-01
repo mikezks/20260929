@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, linkedSignal } from '@angular/core';
 import { addMinutes } from '@flight-demo/shared/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, type, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals';
@@ -45,11 +45,11 @@ export const BookingStore = signalStore(
     delayed: () => store.flightEntities().filter(flight => flight.delayed),
   })),
   withProps(() => ({
-    flightService: inject(FlightService)
+    _flightService: inject(FlightService)
   })),
   // Updater
   withMethods(store => ({
-    setFilter: (filter: FlightFilter) => patchState(store, { filter }),
+    _setFilter: (filter: FlightFilter) => patchState(store, { filter }),
     updateBasket: (id: number, selected: boolean) => patchState(store, state => ({
       basket: {
         ...state.basket,
@@ -62,6 +62,20 @@ export const BookingStore = signalStore(
       date: addMinutes(flight.date, addMin)
     })}, flightEntity)),
     resetFlights: () => patchState(store, removeAllEntities(flightEntity)),
+  })),
+  withProps(store => ({
+    writableFilter: linkedSignal(
+      store.filter,
+      { set: store._setFilter }
+    ),
+    writableFlightSelect: (id: number) => linkedSignal(
+      () => store.basket()[id],
+      { set: (selected: boolean) => store.updateBasket(id, selected) }
+    ),
+    writableFlight: (id: number) => linkedSignal(
+      () => store.flightEntityMap()[id],
+      { set: () => store.delayFlight(id) }
+    ),
   })),
   // Side-Effects
   withMethods(store => ({
