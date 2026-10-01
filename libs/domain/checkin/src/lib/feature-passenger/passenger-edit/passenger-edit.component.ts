@@ -60,7 +60,9 @@ export class PassengerEditComponent {
     { defaultValue: initialPassenger }
   );
   protected readonly passengerWithAddress = linkedSignal(() => ({
-    passenger: this.passengerResource.value(),
+    passenger: this.passengerResource.hasValue()
+      ? this.passengerResource.value()
+      : initialPassenger,
     address: initialAddress
   }), {
     set: (passengerWithAddress, rawSetter) => {
