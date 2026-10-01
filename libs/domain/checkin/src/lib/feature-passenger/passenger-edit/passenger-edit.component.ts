@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, input, linkedSignal, numberAttribute, signal } from '@angular/core';
-import { apply, form, FormField, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { apply, form, FormField, FormRoot, required, schema, SchemaPath, validate } from '@angular/forms/signals';
 import { Address, AddressControl, addressSchema, initialAddress } from '@flight-demo/shared/core';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
@@ -43,7 +43,7 @@ export const passengerSchema = schema<{
   imports: [
     RouterLink,
     // (4) UI Control: Template Binding
-    FormField,
+    FormField, FormRoot,
     AddressControl
   ],
   templateUrl: './passenger-edit.component.html'
@@ -57,13 +57,23 @@ export class PassengerEditComponent {
   protected readonly passengerWithAddress = linkedSignal(() => ({
     passenger: this.passengerResource.value(),
     address: initialAddress
-  }), { set: (passengerWithAddress, rawSetter) => {
-    this.passengerResource.set(passengerWithAddress.passenger);
-    rawSetter(passengerWithAddress);
-  }});
+  }), {
+    set: (passengerWithAddress, rawSetter) => {
+      this.passengerResource.set(passengerWithAddress.passenger);
+      rawSetter(passengerWithAddress);
+    }
+  });
 
   // (2) Field State: valid, value, dirty, ...
-  protected readonly editForm = form(this.passengerWithAddress, passengerSchema);
+  protected readonly editForm = form(
+    this.passengerWithAddress,
+    passengerSchema,
+    {
+      submission: {
+        action: async () => this.save()
+      }
+    }
+  );
 
   readonly id = input(0, { transform: numberAttribute });
 

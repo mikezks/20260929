@@ -4,7 +4,7 @@
   </div>
 
   <div class="card-body">
-    <form>
+    <form [formRoot]="editForm">
       <div class="form-group">
         <label for="id">ID:</label>
         <input id="id" [formField]="editForm.passenger.id" type="number" class="form-control" />
@@ -39,36 +39,37 @@
       </div>
 
       <app-address-subform [formField]="editForm.address" />
+
+      <p>Status: {{ passengerResource.status() }}</p>
+
+      <div class="form-group">
+        <a
+          [routerLink]="['..', this.id()-1]"
+          class="btn btn-default"
+        >
+          ID -1
+        </a>
+        <button
+          type="submit"
+          [disabled]="!editForm().valid()"
+          class="btn btn-default"
+        >
+          Save
+        </button>
+        <button
+          (click)="passengerResource.reload()"
+          class="btn btn-default"
+        >
+          Reload
+        </button>
+        <a
+          [routerLink]="['..', this.id()+1]"
+          class="btn btn-default"
+        >
+          ID +1
+        </a>
+      </div>
     </form>
 
-    <p>Status: {{ passengerResource.status() }}</p>
-
-    <div class="form-group">
-      <a
-        [routerLink]="['..', this.id()-1]"
-        class="btn btn-default"
-      >
-        ID -1
-      </a>
-      <button
-        (click)="save()"
-        [disabled]="!editForm().valid()"
-        class="btn btn-default"
-      >
-        Save
-      </button>
-      <button
-        (click)="passengerResource.reload()"
-        class="btn btn-default"
-      >
-        Reload
-      </button>
-      <a
-        [routerLink]="['..', this.id()+1]"
-        class="btn btn-default"
-      >
-        ID +1
-      </a>
-    </div>
   </div>
 </div>
